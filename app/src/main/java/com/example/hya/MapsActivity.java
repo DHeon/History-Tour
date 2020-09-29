@@ -45,7 +45,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this,new String[] {Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.WRITE_EXTERNAL_STORAGE},200);
         }
-        location = lm.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+        location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        location.setAccuracy(10);
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this); //기본

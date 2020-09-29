@@ -8,7 +8,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class DBHelper extends SQLiteOpenHelper {
     public static final int DATABASE_VERSION = 1;
     public DBHelper(Context context){
-        super(context, "realfinaldesu.db",null,DATABASE_VERSION);
+        super(context, "ha.db",null,DATABASE_VERSION);
     }
     @Override
     public void onCreate(SQLiteDatabase db) {
