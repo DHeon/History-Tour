@@ -131,6 +131,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     public void onMyLocationClick(@NonNull Location location) {
+        float dis = 100000;
         try {
             SQLiteDatabase db = dbhelper.getReadableDatabase();  //데이터베이스를 읽음.
             Cursor exist = db.rawQuery("select exists (select num from main)", null);  //데이터가 존재하는가?
@@ -147,19 +148,18 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     Location a = new Location("Test");
                     a.setLatitude(lng.latitude);
                     a.setLongitude(lng.longitude);
-                    if(location.distanceTo(a) <= 15){
-                        return;
-                    }else{
-                        longitude = location.getLongitude();
-                        latitude = location.getLatitude();
-                        LatLng lng2 = new LatLng(latitude, longitude);  //좌표 가져오기.
-                        MarkerOptions marker = new MarkerOptions();
-                        marker.position(lng2);
-                        marker.title("마커");
-                        mMap.addMarker(marker);
+                    if(dis >= location.distanceTo(a)){
+                        dis = location.distanceTo(a);
                     }
-
-
+                }
+                if(15 < dis){
+                    longitude = location.getLongitude();
+                    latitude = location.getLatitude();
+                    LatLng lng2 = new LatLng(latitude, longitude);  //좌표 가져오기.
+                    MarkerOptions marker = new MarkerOptions();
+                    marker.position(lng2);
+                    marker.title("마커");
+                    mMap.addMarker(marker);
                 }
             }
         } catch (SQLiteException | NullPointerException e) {
