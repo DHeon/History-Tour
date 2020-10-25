@@ -17,6 +17,7 @@ import android.provider.MediaStore;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -51,14 +52,14 @@ public class SubActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.subactivity);
 
         tv = (EditText) findViewById(R.id.tt);
         con = (EditText) findViewById(R.id.contents);
         i = (ImageView)findViewById(R.id.image);
 
-        String imageUrl = "https://www.bloter.net/wp-content/uploads/2020/03/tH1496SipRLCtEL.jpg";  //사진 가져옴.
-        Glide.with(this).load(imageUrl).into(i);
 
         intent2 = getIntent();
         la = Double.toString(intent2.getExtras().getDouble("La"));
@@ -68,9 +69,18 @@ public class SubActivity extends AppCompatActivity {
         String sm = la+" " + lo;
         Toast.makeText(this,sm,Toast.LENGTH_LONG).show();
 
-
         try{
             SQLiteDatabase db = helper.getReadableDatabase();
+            Cursor exist2 = db.rawQuery("select exists (select image from main where lat="+la+" and lon="+lo+")", null);
+            exist2.moveToFirst();
+            if(!exist2.getString(0).equals("0")){
+                Cursor cursor = db.rawQuery("select image from main where lat="+la+" and lon="+lo+"", null);
+                cursor.moveToLast();
+                Bitmap bm = StringToBitmap(cursor.getString(0));
+                i.setImageBitmap(bm);
+            }else{
+                Glide.with(this).load(R.drawable.upload).into(i);
+            }
             Cursor exist = db.rawQuery("select exists (select title, content from main where lat="+la+" and lon="+lo+")",null);
             exist.moveToFirst();
             if(!exist.getString(0).equals("0")){
@@ -80,19 +90,11 @@ public class SubActivity extends AppCompatActivity {
                 con.setText(cursor.getString(1));
             }
 
-            Cursor exist2 = db.rawQuery("select exists (select image from main where lat="+la+" and lon="+lo+")", null);
-            exist2.moveToFirst();
-            if(!exist2.getString(0).equals("0")){
-                Cursor cursor = db.rawQuery("select image from main where lat="+la+" and lon="+lo+"", null);
-                cursor.moveToLast();
-                Bitmap bm = StringToBitmap(cursor.getString(0));
-                i.setImageBitmap(bm);
-            }
         }catch(SQLiteException e){
             e.printStackTrace();
         }//데이터베이스에서 제목이랑 내용 불러옴-
     }
-        String en;
+        String en; //중요함 이미지임.
     public void getC(View view){
         String contents  = con.getText().toString();
         name = tv.getText().toString();
@@ -100,7 +102,7 @@ public class SubActivity extends AppCompatActivity {
         SQLiteDatabase db = helper.getWritableDatabase();
         SQLiteDatabase db2 = helper.getReadableDatabase();
         if(en != null){
-                Cursor exist = db2.rawQuery("select exists (select lon, lat from main where lon="+lo+" and lat="+la+")",null);
+            Cursor exist = db2.rawQuery("select exists (select lon, lat from main where lon="+lo+" and lat="+la+")",null);
             exist.moveToFirst();
             if(!exist.getString(0).equals("0")){
                 db.execSQL("update main SET title=?,content=?,image=? where lon="+lo+" and lat="+la+"",new String[]{name,contents,en});
@@ -115,7 +117,6 @@ public class SubActivity extends AppCompatActivity {
             }else{
                 db.execSQL("insert into main (lon, lat, title, content) values (?,?,?,?)",new String[]{lo,la,name,contents});
             }
-
         }
         Intent intent = new Intent();
         intent.putExtra("key",name);
