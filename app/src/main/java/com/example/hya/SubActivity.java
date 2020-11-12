@@ -81,6 +81,7 @@ public class SubActivity extends AppCompatActivity {
                 }else{
                     Bitmap bm = StringToBitmap(cursor.getString(0));
                     i.setImageBitmap(bm);
+
                 }
 
             }
