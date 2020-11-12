@@ -34,9 +34,9 @@ import com.google.android.gms.maps.model.MarkerOptions;
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener, GoogleMap.OnMyLocationButtonClickListener, GoogleMap.OnMyLocationClickListener {
 
     private GoogleMap mMap;
-    LocationManager lm;
-    Location location;
-    DBHelper dbhelper = new DBHelper(this);
+    private LocationManager lm;
+    private Location location;
+    private DBHelper dbhelper = new DBHelper(this);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,13 +61,12 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             return;
         }
         mMap = googleMap;
-        // Add a marker in Sydney and move the camera
         mMap.setOnMarkerClickListener(this);
         LatLng seoul = new LatLng(37.5642135, 127.0016985);//서울에 맞춤.
         mMap.moveCamera(CameraUpdateFactory.newLatLng(seoul));  //서울로 카메라 옮김.
-        mMap.setMyLocationEnabled(true);
+        mMap.setMyLocationEnabled(true); //내 위치 버튼 활성화
         mMap.setOnMyLocationButtonClickListener(this);
-        mMap.setOnMyLocationClickListener(this);
+        mMap.setOnMyLocationClickListener(this); //내 위치 클릭
         mMap.setMinZoomPreference(7f);
         try {
             SQLiteDatabase db = dbhelper.getReadableDatabase();  //데이터베이스를 읽음.
@@ -89,6 +88,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 AlertDialog ad = builder.create();
                 ad.show();
             }
+
         } catch (SQLiteException | NullPointerException e) {
             e.printStackTrace();
         }
@@ -116,23 +116,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
-    double longitude;
-    double latitude;
+    protected double longitude;
+    protected double latitude;
 
-    public void mylocation(View view) { //버튼을 누르면 내 위치에 마커를 찍음.
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return;
-        }
-        double lat = longitude;
-        double lon = latitude;
-        LatLng lng = new LatLng(lat, lon);  //좌표 가져오기.
-        MarkerOptions marker = new MarkerOptions();
-        marker.position(lng);
-        marker.title("당신의 위치");
-        mMap.addMarker(marker);
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(lng, 1));
-    }
-    Marker nm;
+    private Marker nm;
 
     @Override
     public boolean onMarkerClick(Marker marker) { //마커 클릭시 이벤트.
@@ -141,8 +128,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         intent.putExtra("La", marker.getPosition().latitude);
         intent.putExtra("Lo", marker.getPosition().longitude);  //경도랑 위도 데이터 넘김.
         startActivityForResult(intent, 1); //작동.
-        nm = marker;//?
-        // Toast.makeText(this,string,Toast.LENGTH_LONG).show();
+        nm = marker;
         return false;
     }
 

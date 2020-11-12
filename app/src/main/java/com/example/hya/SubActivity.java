@@ -76,10 +76,13 @@ public class SubActivity extends AppCompatActivity {
             if(!exist2.getString(0).equals("0")){
                 Cursor cursor = db.rawQuery("select image from main where lat="+la+" and lon="+lo+"", null);
                 cursor.moveToLast();
-                Bitmap bm = StringToBitmap(cursor.getString(0));
-                i.setImageBitmap(bm);
-            }else{
-                Glide.with(this).load(R.drawable.upload).into(i);
+                if(cursor.getString(0) == null){
+                    Glide.with(this).load(R.drawable.upload).into(i);
+                }else{
+                    Bitmap bm = StringToBitmap(cursor.getString(0));
+                    i.setImageBitmap(bm);
+                }
+
             }
             Cursor exist = db.rawQuery("select exists (select title, content from main where lat="+la+" and lon="+lo+")",null);
             exist.moveToFirst();
@@ -94,11 +97,10 @@ public class SubActivity extends AppCompatActivity {
             e.printStackTrace();
         }//데이터베이스에서 제목이랑 내용 불러옴-
     }
-        String en; //중요함 이미지임.
+    String en;
     public void getC(View view){
         String contents  = con.getText().toString();
         name = tv.getText().toString();
-        Toast.makeText(this,contents + " " + name,Toast.LENGTH_LONG).show();
         SQLiteDatabase db = helper.getWritableDatabase();
         SQLiteDatabase db2 = helper.getReadableDatabase();
         if(en != null){
@@ -153,6 +155,7 @@ public class SubActivity extends AppCompatActivity {
 
         }
     }
+
     public static Bitmap StringToBitmap(String encodedString) {
         try {
             byte[] encodeByte = Base64.decode(encodedString, Base64.DEFAULT);
@@ -164,9 +167,6 @@ public class SubActivity extends AppCompatActivity {
         }
     }
 
-    /*
-     * Bitmap을 String형으로 변환
-     * */
     public static String BitmapToString(Bitmap bitmap) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.PNG, 70, baos);
